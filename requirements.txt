@@ -1,0 +1,5 @@
+pbr>=0.6,<1.0
+gevent
+PyYAML>=3.1.0
+web.py
+gitpython
