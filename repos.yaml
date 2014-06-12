@@ -11,15 +11,21 @@ repos:
     git: https://github.com/ceph/ceph.git
     path: /home/ubuntu/ceph
     branch: master
+  libvirt:
+    name: libvirt
+    title: libvirt The virtualization API
+    git: git://libvirt.org/libvirt.git
+    path: /home/ubuntu/libvirt
+    branch: master
   nova:
     name: nova
-    title: OpenStack Compute (Nova)
+    title: Nova The OpenStack Compute
     git: https://github.com/openstack/nova.git
     path: /home/ubuntu/nova
     branch: master
   warm:
     name: warm
-    title: Warm - Deploy a simple OpenStack environment from template
+    title: Warm, Deploy simple OpenStack environments from templates
     git: https://github.com/stackforge/warm.git
     path: /home/ubuntu/warm
     branch: master
