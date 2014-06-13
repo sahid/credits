@@ -35,5 +35,10 @@ repos:
     git: https://github.com/Juniper/contrail-controller.git
     path: /home/ubuntu/contrail-controller
     branch: master
-
+  neutron:
+    name: neutron 
+    title: Neutron The OpenStack Networking
+    git: https://github.com/openstack/neutron.git
+    path: /home/ubuntu/neutron
+    branch: master
 
