@@ -29,4 +29,11 @@ repos:
     git: https://github.com/stackforge/warm.git
     path: /home/ubuntu/warm
     branch: master
+  contrail-controller:
+    name: contrail-controller
+    title: Contrail Virtual Network Controller
+    git: https://github.com/Juniper/contrail-controller.git
+    path: /home/ubuntu/contrail-controller
+    branch: master
+
 
