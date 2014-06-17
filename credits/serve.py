@@ -237,6 +237,8 @@ def main():
 
     gevent.spawn(sync)
 
+    print "Starting server on %s:%d, threads=%d..." %\
+        (options.address, options.port, options.concurrency)
     WSGIServer((options.address, options.port),
                application,
                spawn=Pool(options.concurrency),
