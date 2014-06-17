@@ -8,12 +8,11 @@
 # License version 2.1, as published by the Free Software 
 # Foundation.  See file COPYING.
 
+
 import logging
 import optparse
 import os
-import re
 import sys
-import itertools
 from subprocess import call
 from string import Template
 
@@ -22,6 +21,7 @@ import yaml
 import web
 import git
 
+from credits import api
 from credits import util
 
 USAGE = "usage: %prog repos.yaml [options]"
@@ -60,25 +60,6 @@ class reviews(object):
         return render.reviews(name, data)
 
 
-def git_authors(name):
-    r = config['repos'][name]
-    g = git.Repo(r["path"]).git
-    g.pull("origin", r["branch"])
-    content = g.log(pretty='%aN <%aE>').decode("utf-8").split("\n")
-    content = [util.antispam(s) for s in content]
-    content = [(len(list(x)), a)for a, x in itertools.groupby(sorted(content))]
-    return sorted(content, reverse=True)
-
-def git_reviews(name):
-    r = config['repos'][name]
-    g = git.Repo(r["path"]).git
-    g.pull("origin", r["branch"])
-    content = g.log(pretty='%b').decode("utf-8")
-    content = re.findall('Reviewed-by:\s*(.*<.*>)', content, re.I)
-    content = [util.antispam(s) for s in content]
-    content = [(len(list(x)), a) for a, x in itertools.groupby(sorted(content))]
-    return sorted(content, reverse=True)
-
 def sync():
     while True:
         for name, repo in config['repos'].iteritems():
@@ -89,13 +70,15 @@ def sync():
         gevent.sleep(config.get('sync', DEFAULT_SYNC))
 
 def sync_project(name):
+    rpos = config["repos"]
     data = [(i+1, contrib[1], int(contrib[0])) \
-                for i, contrib in enumerate(git_authors(name))]
+                for i, contrib in enumerate(api.git_authors(rpos[name]))]
     CACHE["project/%s" % name] = data
 
 def sync_reviews(name):
+    rpos = config["repos"]
     data = [(i+1, contrib[1], int(contrib[0])) \
-                for i, contrib in enumerate(git_reviews(name))]
+                for i, contrib in enumerate(api.git_reviews(rpos[name]))]
     CACHE["project/%s/reviews" % name] = data
 
 config = None
