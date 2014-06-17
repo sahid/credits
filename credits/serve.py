@@ -21,8 +21,8 @@ import gevent
 import yaml
 import web
 import git
-import pbr.version
 
+from credits import util
 
 USAGE = "usage: %prog repos.yaml [options]"
 URLS = ("/", "index",
@@ -58,9 +58,6 @@ class reviews(object):
         data = CACHE.get("project/%s/reviews" % name, [])
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
         return render.reviews(name, data)
-
-def get_version():
-    return pbr.version.VersionInfo('credits').version_string()
 
 def antispam(s):
     return re.sub("@.*>", "@xxx.org>", s)
@@ -106,7 +103,7 @@ def sync_reviews(name):
 config = None
 application = web.application(URLS, globals()).wsgifunc()
 t_globals = {
-    'version': get_version(),
+    'version': util.get_version(),
 }
 render = web.template.render('templates', base='base', globals=t_globals)
 
