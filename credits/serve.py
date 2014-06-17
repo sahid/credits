@@ -119,11 +119,15 @@ class index(object):
 
 class project(object):
     def GET(self, name):
+        if name not in config['repos']:
+            return web.notfound()
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
         return CACHE.get("project/%s" % name, "generating...")
 
 class reviews(object):
     def GET(self, name):
+        if name not in config['repos']:
+            return web.notfound()
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
         return CACHE.get("project/%s/reviews" % name, "generating...")
 
