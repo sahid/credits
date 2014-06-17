@@ -1,9 +1,17 @@
-Credits - Firefly contributors credits
+Credits - Firefly Contributors Credits
 ======================================
 
-Simple projects to follow contributions on OpenSource projects
+This project aim to create a simple way to follow contributions
+on git based projects.
+
+It should be use as an internal web view.
+
+You can see an example of the porject running at:
+
+    http://credits.sahid.us
+
+Please, feel free to push Pull Request on the branch credits.sahid.us to
+add new Open Source project.
 
 This was largely inspired by:
   http://www.spinics.net/lists/ceph-devel/msg18941.html
-
-Please feel free to push a pull request to integrate your project.
