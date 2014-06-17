@@ -60,13 +60,16 @@ class reviews(object):
         return render.reviews(name, data)
 
 
-def sync():
+def sync(forground=False):
+    sync_cache = not forground
     while True:
         for name, repo in config['repos'].iteritems():
             if not os.path.exists(repo['path']):
                 call(["git", "clone", repo["git"], repo['path']])
-            sync_project(name)
-            sync_reviews(name)
+            if sync_cache:
+                sync_project(name)
+                sync_reviews(name)
+        if forground: return
         gevent.sleep(config.get('sync', DEFAULT_SYNC))
 
 def sync_project(name):
@@ -121,7 +124,7 @@ def main():
     (options, args) = parser.parse_args()
 
     if getattr(options, "init"):
-        init_repos()
+        sync(forground=True)
         exit()
 
     from gevent.pool import Pool
