@@ -1,0 +1,6 @@
+$def with (repos)
+
+<ul>
+  $for name, project in repos.iteritems():
+    <li><a title="$project['title']" href="/$name">$name</a></li>
+</ul>

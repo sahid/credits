@@ -1,0 +1,14 @@
+$def with (name, data)
+
+<h2>$name</h2>
+<h3>Reviews by authors</h3>
+<a href="/">back</a>
+<ul>
+  <li><a href="/$name">Reviews by authors</a></li>
+  <li><a href="/$name/reviews">Reviews by authors</a></li>
+</ul>
+<pre>
+  #	Reviews	Author
+  $for rank, author, reviews in data:
+    $rank	$reviews	$author
+</pre>

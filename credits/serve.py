@@ -20,8 +20,6 @@ from string import Template
 import gevent
 import yaml
 import web
-import web.http
-import web.net
 import git
 import pbr.version
 
@@ -30,106 +28,36 @@ USAGE = "usage: %prog repos.yaml [options]"
 URLS = ("/", "index",
         '/(.*)/reviews', 'reviews',
         '/(.*)', 'project')
-CACHE = {} # All stay in memory...
 DEFAULT_SYNC=3600
 DEFAULT_ADDR="127.0.0.1"
 DEFAULT_PORT=8080
 DEFAULT_EXPIRES=500
 
-application = web.application(URLS, globals()).wsgifunc()
-config = None
-
-TPL_INDEX = Template("""
-<html>
-  <h1>Credits</h1>
-  <ul>
-    $li_list
-  </ul>
-  </hr>
-  <em>
-    Version: $version -
-    <a href="https://github.com/sahid/credits">
-      Add you project here - https://github.com/sahid/credits
-    </a>
-  </em>
-</html>
-""")
-TPL_INDEX_LILINK = Template("""
-<li>
-  <a href="/$name">$title</a>
-</li>
-""")
-
-TPL_PROJECT_REVIEWS = Template("""
-<html>
-  <h1>Credits</h1>
-  <h2>Reviews by authors</h2>
-  <h3>$name</h3>
-  <em>$title</em> &bullet; <a href="/">back</a>
-  <ul>
-    <li><a href="/$name">Commits by authors</a></li>
-    <li><a href="/$name/reviews">Reviews by authors</a></li>
-  </ul>
-  <pre>
-  #\tReviews\tAuthor
-  $tr_list
-  </pre>
-  </hr>
-  <em>
-    Version: $version -
-    <a href="https://github.com/sahid/credits">
-      Add you project here - https://github.com/sahid/credits
-    </a>
-  </em>
-</html>
-""")
-TPL_PROJECT_COMMITS = Template("""
-<html>
-  <h1>Credits</h1>
-  <h2>Commits by authors</h2>
-  <h3>$name</h3>
-  <em>$title</em> &bullet; <a href="/">back</a>
-  <ul>
-    <li><a href="/$name">Commits by authors</a></li>
-    <li><a href="/$name/reviews">Reviews by authors</a></li>
-  </ul>
-  <pre>
-  #\tCommits\tAuthor
-  $tr_list
-  </pre>
-  </hr>
-  <em>
-    Version: $version -
-    <a href="https://github.com/sahid/credits">
-      Add you project here - https://github.com/sahid/credits
-    </a>
-  </em>
-</html>
-""")
-
-TPL_PROJECT_TR = Template("""
-  $rank\t$misc\t$author
-""")
+CACHE = {} # All stay in memory...
 
 
 class index(object):
     def GET(self):
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
-        return CACHE.get("index", "generating...")
+        return render.index(config['repos'])
 
 class project(object):
     def GET(self, name):
         if name not in config['repos']:
             return web.notfound()
+
+        data = CACHE.get("project/%s" % name, [])
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
-        return CACHE.get("project/%s" % name, "generating...")
+        return render.project(name, data)
 
 class reviews(object):
     def GET(self, name):
         if name not in config['repos']:
             return web.notfound()
+
+        data = CACHE.get("project/%s/reviews" % name, [])
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
-        return CACHE.get("project/%s/reviews" % name, "generating...")
+        return render.reviews(name, data)
 
 def get_version():
     return pbr.version.VersionInfo('credits').version_string()
@@ -158,7 +86,6 @@ def git_reviews(name):
 
 def sync():
     while True:
-        sync_index()
         for name, repo in config['repos'].iteritems():
             if not os.path.exists(repo['path']):
                 call(["git", "clone", repo["git"], repo['path']])
@@ -166,35 +93,22 @@ def sync():
             sync_reviews(name)
         gevent.sleep(config.get('sync', DEFAULT_SYNC))
 
-def sync_index():
-    li_list = "".join(
-        [TPL_INDEX_LILINK.substitute(repo) for name, repo in config['repos'].iteritems()])
-    version = get_version()
-    CACHE["index"] = TPL_INDEX.substitute(locals())
-
 def sync_project(name):
-    title = config["repos"][name].get("title", "no title...")
-    version = get_version()
-    tr_list = []
-    for i, contrib in enumerate(git_authors(name)):
-        tr_list.append(TPL_PROJECT_TR.substitute({
-                    'rank': i+1,
-                    'author': web.net.websafe(contrib[1]),
-                    'misc': int(contrib[0])}))
-    tr_list = "".join(tr_list)
-    CACHE["project/%s" % name] = TPL_PROJECT_COMMITS.substitute(locals())
+    data = [(i+1, contrib[1], int(contrib[0])) \
+                for i, contrib in enumerate(git_authors(name))]
+    CACHE["project/%s" % name] = data
 
 def sync_reviews(name):
-    title = config["repos"][name].get("title", "no title...")
-    version = get_version()
-    tr_list = []
-    for i, contrib in enumerate(git_reviews(name)):
-        tr_list.append(TPL_PROJECT_TR.substitute({
-                    'rank': i+1,
-                    'author': web.net.websafe(contrib[1]),
-                    'misc': int(contrib[0])}))
-    tr_list = "".join(tr_list)
-    CACHE["project/%s/reviews" % name] = TPL_PROJECT_REVIEWS.substitute(locals())
+    data = [(i+1, contrib[1], int(contrib[0])) \
+                for i, contrib in enumerate(git_reviews(name))]
+    CACHE["project/%s/reviews" % name] = data
+
+config = None
+application = web.application(URLS, globals()).wsgifunc()
+t_globals = {
+    'version': get_version(),
+}
+render = web.template.render('templates', base='base', globals=t_globals)
 
 def main():
     global config
