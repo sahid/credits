@@ -59,15 +59,13 @@ class reviews(object):
         web.http.expires(config.get("expires", DEFAULT_EXPIRES))
         return render.reviews(name, data)
 
-def antispam(s):
-    return re.sub("@.*>", "@xxx.org>", s)
 
 def git_authors(name):
     r = config['repos'][name]
     g = git.Repo(r["path"]).git
     g.pull("origin", r["branch"])
     content = g.log(pretty='%aN <%aE>').decode("utf-8").split("\n")
-    content = [antispam(s) for s in content]
+    content = [util.antispam(s) for s in content]
     content = [(len(list(x)), a)for a, x in itertools.groupby(sorted(content))]
     return sorted(content, reverse=True)
 
@@ -77,7 +75,7 @@ def git_reviews(name):
     g.pull("origin", r["branch"])
     content = g.log(pretty='%b').decode("utf-8")
     content = re.findall('Reviewed-by:\s*(.*<.*>)', content, re.I)
-    content = [antispam(s) for s in content]
+    content = [util.antispam(s) for s in content]
     content = [(len(list(x)), a) for a, x in itertools.groupby(sorted(content))]
     return sorted(content, reverse=True)
 
