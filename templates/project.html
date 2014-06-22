@@ -1,14 +1,22 @@
 $def with (name, data)
 
 <h2>$name</h2>
-<h3>Reviews by authors</h3>
+<h3>Commits by authors</h3>
 <a href="/">back</a>
 <ul>
   <li><a href="/$name">Commits by authors</a></li>
   <li><a href="/$name/reviews">Reviews by authors</a></li>
 </ul>
-<pre>
-  #	Commits	Author
+<table>
+  <tr>
+    <th>#</th>
+    <th>Author</th>
+    <th>Commit</th>
+  </tr>
   $for rank, author, commits in data:
-    $rank	$commits	$author
-</pre>
+    <tr>
+      <td>$rank</td>
+      <td>$author</td>
+      <td>$commits</td>
+    </tr>
+</table>
