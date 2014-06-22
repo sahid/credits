@@ -10,8 +10,8 @@ You can see an example of the project running at:
 
     http://credits.sahid.us
 
-Please, feel free to push Pull Request on the branch credits.sahid.us to
-add new Open Source project.
+Please, feel free to push Pull Request to update sample/config.yaml to
+add a new opensource project.
 
 This was largely inspired by:
   http://www.spinics.net/lists/ceph-devel/msg18941.html

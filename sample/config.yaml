@@ -1,0 +1,46 @@
+# This is an example used in http://credits.sahid.us
+# Feel free to add your project here by creating pull request.
+
+address: 0.0.0.0
+port: 80
+concurrency: 100
+sync: 300
+expires: 60
+
+repos:
+  ceph:
+    name: ceph
+    title: Ceph is a distributed object, block, and file storage platform
+    git: https://github.com/ceph/ceph.git
+    path: /home/ubuntu/ceph
+    branch: master
+  libvirt:
+    name: libvirt
+    title: libvirt The virtualization API
+    git: git://libvirt.org/libvirt.git
+    path: /home/ubuntu/libvirt
+    branch: master
+  nova:
+    name: nova
+    title: Nova The OpenStack Compute
+    git: https://github.com/openstack/nova.git
+    path: /home/ubuntu/nova
+    branch: master
+  warm:
+    name: warm
+    title: Warm, Deploy simple OpenStack environments from templates
+    git: https://github.com/stackforge/warm.git
+    path: /home/ubuntu/warm
+    branch: master
+  contrail-controller:
+    name: contrail-controller
+    title: Contrail Virtual Network Controller
+    git: https://github.com/Juniper/contrail-controller.git
+    path: /home/ubuntu/contrail-controller
+    branch: master
+  neutron:
+    name: neutron 
+    title: Neutron The OpenStack Networking
+    git: https://github.com/openstack/neutron.git
+    path: /home/ubuntu/neutron
+    branch: master
